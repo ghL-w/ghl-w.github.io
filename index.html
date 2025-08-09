@@ -10,25 +10,47 @@
 
   <style>
     :root {
-      --bg: #fff7f9;
-      --text: #333;
+      --overlay: rgba(255, 255, 255, 0.6); /* white veil to keep text readable */
+      --text: #2a2a2a;
     }
     html, body {
       height: 100%;
       margin: 0;
     }
     body {
-  display: grid;
-  place-items: center;
-  background: url('background.jpg') no-repeat center center/cover;
-  font-family: 'Nanum Pen Script', cursive;
-  overflow-x: hidden;
-}
-    h1 {
-      font-size: 64px;
-      margin: 0;
-      color: var(--text);
+      display: grid;
+      place-items: center;
+      /* OPTION A: local file you upload to the repo */
+      background: url('background.jpg') no-repeat center center / cover;
+      /* OPTION B: use an online image instead (uncomment next line & replace the URL)
+      background: url('https://images.unsplash.com/photo-1517249361621-f11084eb8ba4?q=80&w=1920&auto=format&fit=crop') no-repeat center center / cover;
+      */
+      font-family: 'Nanum Pen Script', cursive;
+      overflow-x: hidden; /* keeps hearts from making scrollbars */
+    }
+
+    /* soft overlay so text pops */
+    .veil {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.35));
+      pointer-events: none;
+    }
+
+    .card {
+      background: var(--overlay);
+      padding: 28px 36px;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
       text-align: center;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    h1 {
+      margin: 0;
+      font-size: 64px;
+      color: var(--text);
+      line-height: 1.1;
     }
 
     /* falling hearts */
@@ -42,11 +64,12 @@
       animation-name: fall-spin;
       animation-timing-function: linear;
       animation-fill-mode: forwards;
-      opacity: 0.9;
+      opacity: 0.92;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
     }
     @keyframes fall-spin {
       0%   { transform: translateY(-10vh) rotate(0deg); }
-      100% { transform: translateY(110vh) rotate(360deg); opacity: 0.3; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0.35; }
     }
 
     /* Respect users who prefer less motion */
@@ -56,7 +79,11 @@
   </style>
 </head>
 <body>
-  <h1>&lt;진희야 보고싶어&gt;</h1>
+  <div class="veil" aria-hidden="true"></div>
+
+  <div class="card">
+    <h1>&lt;진희야 보고싶어&gt;</h1>
+  </div>
 
   <script>
     // create one heart with random size, position, speed, and emoji
@@ -70,25 +97,24 @@
       // random horizontal position
       el.style.left = Math.random() * 100 + 'vw';
       // random size
-      el.style.fontSize = (16 + Math.random() * 40) + 'px';
+      el.style.fontSize = (18 + Math.random() * 46) + 'px';
       // random duration (fall speed)
-      const dur = 3 + Math.random() * 5; // 3–8s
+      const dur = 3 + Math.random() * 6; // 3–9s
       el.style.animationDuration = dur + 's';
 
       document.body.appendChild(el);
-      // remove the heart after it finishes so the page stays fast
+      // remove after it finishes so the page stays fast
       setTimeout(() => el.remove(), dur * 1000);
     }
 
-    // make hearts every 250–600ms
-    let timer = setInterval(() => {
-      createHeart();
-    }, 350);
+    // make hearts periodically
+    function startRain() { return setInterval(createHeart, 360); }
+    let timer = startRain();
 
     // Pause hearts if tab is hidden (saves battery)
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) { clearInterval(timer); }
-      else { timer = setInterval(createHeart, 350); }
+      else { timer = startRain(); }
     });
   </script>
 </body>
